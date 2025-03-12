@@ -1,4 +1,4 @@
-from User import User
+from classes.User import User
 
 class Transaction:
     def __init__(self, user : User, amount : float, transactionType : str, timestamp , transactionid : str):

@@ -1,5 +1,5 @@
-from User import User
-from Locker import Locker
+from classes.User import User
+from classes.Locker import Locker
 
 class LogEvent:
     def __init__(self, user : User, locker : Locker, action : str, timestamp):

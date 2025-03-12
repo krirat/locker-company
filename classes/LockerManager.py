@@ -1,4 +1,4 @@
-from Locker import Locker
+from classes.Locker import Locker
 
 class LockerManager:
     def __init__(self, name : str):

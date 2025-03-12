@@ -1,4 +1,4 @@
-from Locker import Locker
+from classes.Locker import Locker
 
 class MaintenanceService:
     def perform_maintenance(self, locker: Locker):
