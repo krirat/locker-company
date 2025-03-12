@@ -10,7 +10,7 @@ authService.registerUser(Guest(0, "John Doe", "johndoe01@gmail.com", "012345678"
 
 
 
-app, rt = fast_app()
+app, rt = fast_app(live=True)
 
 @rt("/")
 def get():
@@ -36,8 +36,19 @@ def post(email:str, password:str):
 @rt("/dashboard")
 def get():
     return Main(
-        Titled("Hello")
-    )
+        Nav("Hello",    
+        style="color:white; background-color:#2991c2; padding:32px"),
+        Div(
+            Div(
+                *[Div("button", style="padding: 0.5rem") for _ in range(5)],
+            id="sidebar", 
+            style="background-color:#0c364a; flex-grow: 1; display:flex; flex-direction:column; padding: 1rem"),
+            Div("content",
+            
+            id="main-dashboard",
+            style="background-color: #dcedf5; flex-grow: 5; padding: 5rem"),
+        style="display:flex; flex-direction:row; align-content: stretch; height: 100vh"),
+    style="padding:0")
 
 @rt("/maintenance")
 def get():
