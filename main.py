@@ -10,7 +10,7 @@ authService.registerUser(Guest(0, "John Doe", "johndoe01@gmail.com", "012345678"
 
 
 
-app, rt = fast_app(live=True)
+app, rt = fast_app()
 
 @rt("/")
 def get():
@@ -33,9 +33,11 @@ def post(email:str, password:str):
 
 
 
-@rt("/admin")
+@rt("/dashboard")
 def get():
-    return Titled("TLC Admin", P("admin"))
+    return Main(
+        Titled("Hello")
+    )
 
 @rt("/maintenance")
 def get():
