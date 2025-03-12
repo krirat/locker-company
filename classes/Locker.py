@@ -1,4 +1,4 @@
-from User import User
+from classes.User import User
 
 class Locker :
     def __init__(self, lockerNumber : int, status : str, assignedUser : User, pin : int, reservation) :

@@ -1,5 +1,5 @@
-from User import User
-from Locker import Locker
+from classes.User import User
+from classes.Locker import Locker
 
 class AuthService:
     __users: list[User] = []
@@ -7,19 +7,19 @@ class AuthService:
     def registerUser(self, user: User):
         self.__users.append(user)
 
-    def loginUser(self, id, password):
+    def loginUser(self, email, password):
         for user in self.__users:
-            if user.id == id and user.password == password:
-                return print("Access granted")
+            if user.email == email and user.password == password:
+                return "Access granted"
 
-        print("Access Denied")
+        return "Access Denied"
 
     def validatePin(locker: Locker, pin) -> bool:
         pass
 
     def verifyOTP():
         pass
-    
+
     def sendOTP():
         pass
 

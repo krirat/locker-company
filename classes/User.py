@@ -1,5 +1,5 @@
 class User : 
-    def __init__(self, id : int, name : str, email : str, phone : int, password : str) :
+    def __init__(self, id : int, name : str, email : str, phone : str, password : str) :
         self.__id = id
         self.__name = name
         self.__email = email 
@@ -9,6 +9,10 @@ class User :
     @property
     def id(self):
         return self.__id 
+    
+    @property
+    def email(self):
+        return self.__email 
 
     @property
     def password(self):
