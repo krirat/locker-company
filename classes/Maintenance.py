@@ -1,4 +1,4 @@
-class Maintanance :
+class Maintenance :
         def __init__(self, ID, password) :
             self.__ID = ID
             self.__password = password
@@ -6,7 +6,7 @@ class Maintanance :
         def login(self, ID, password):
             print(f"{self.name} logged in.")
 
-        def markMaintanance(self, locker,):
+        def markMaintenance(self, locker,):
             locker.status = "Under maintenance"
             print(f"Locker {locker.lockerNumber} marked maintenance")
 

@@ -1,3 +1,6 @@
+from User import User
+from Locker import Locker
+
 class Reservation :
     def __init__(self, startTime, reservaionTime):
         self.__user : list[User] = []

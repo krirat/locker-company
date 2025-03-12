@@ -1,3 +1,5 @@
+from Locker import Locker
+
 class LockerManager:
     def __init__(self, name : str):
         self.name = name
@@ -13,7 +15,7 @@ class LockerManager:
             print(f"Locker {locker.lockerNumber} is not available")
 
     def release_locker(self, locker):
-        locker.free
+        locker.free()
 
     def get_locker_by_number(self, number):
         for locker in self.lockers:

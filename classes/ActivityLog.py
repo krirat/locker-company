@@ -1,3 +1,5 @@
+from LogEvent import LogEvent
+
 class ActivityLog :
     def __init__(self):
         self.logs : list[LogEvent] = []

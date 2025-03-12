@@ -1,5 +1,5 @@
 class Admin:
-    def __init__(self, ID : int, password : str, email : str, name : str, phone : int,) :
+    def __init__(self, ID : int, password : str, email : str, name : str, phone : int) :
         self.__ID = ID
         self.__password = password
         self.__email = email 

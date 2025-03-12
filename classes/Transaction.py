@@ -1,3 +1,5 @@
+from User import User
+
 class Transaction:
     def __init__(self, user : User, amount : float, transactionType : str, timestamp , transactionID : str):
         self.__user = user
