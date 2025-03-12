@@ -1,12 +1,11 @@
-class Maintenance :
-        def __init__(self, ID, password) :
-            self.__ID = ID
-            self.__password = password
+from User import User
 
-        def login(self, ID, password):
+class Maintenance(User) :
+
+        def login(self, id, password):
             print(f"{self.name} logged in.")
 
-        def markMaintenance(self, locker,):
+        def markMaintenance(self, locker):
             locker.status = "Under maintenance"
             print(f"Locker {locker.lockerNumber} marked maintenance")
 

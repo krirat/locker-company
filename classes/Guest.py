@@ -1,7 +1,5 @@
-class Guest :
-    def __init__(self, ID, password):
-        self.__ID = ID
-        self.__password = password
-    
-    def login(self, ID, password):
+from User import User
+
+class Guest(User) : 
+    def login(self, id, password):
          print(f"{self.name} logged in.")

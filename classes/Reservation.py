@@ -2,13 +2,13 @@ from User import User
 from Locker import Locker
 
 class Reservation :
-    def __init__(self, startTime, reservaionTime):
-        self.__user : list[User] = []
-        self.__locker : list[Locker] = []
+    def __init__(self, user, locker, startTime, reservationTime):
+        self.__user = user
+        self.__locker = locker
         self.__startTime = startTime
-        self.__reservationTime = reservaionTime
+        self.__reservationTime = reservationTime
     
-    def extendedReservaion(self):
+    def extendReservation(self):
         print(f"Reservation for locker {self.locker.lockerNumber} extended.")
 
     def cancel(self):

@@ -1,12 +1,8 @@
-class Admin:
-    def __init__(self, ID : int, password : str, email : str, name : str, phone : int) :
-        self.__ID = ID
-        self.__password = password
-        self.__email = email 
-        self.__name = name
-        self.__phone = phone
+from User import User
 
-    def login(self, ID, __password):
+class Admin(User):
+
+    def login(self, id, __password):
          print(f"{self.name} logged in.")
 
     def assign_locker(self, locker, user):
