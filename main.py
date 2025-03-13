@@ -10,7 +10,7 @@ authService.registerUser(Guest(0, "John Doe", "johndoe01@gmail.com", "012345678"
 
 
 
-app, rt = fast_app(live=True)
+app, rt = fast_app(live=True, pico=True, hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
 
 @rt("/")
 def get():
@@ -32,22 +32,23 @@ def post(email:str, password:str):
     return result
 
 
+def lockerItem():
+    return Div(H2("Locker"),P("1"))
+
 
 @rt("/dashboard")
 def get():
     return Main(
-        Nav("Hello",    
-        style="color:white; background-color:#2991c2; padding:32px"),
+        Nav(H1("Hello")),
         Div(
             Div(
                 *[Div("button", style="padding: 0.5rem") for _ in range(5)],
-            id="sidebar", 
-            style="background-color:#0c364a; flex-grow: 1; display:flex; flex-direction:column; padding: 1rem"),
-            Div("content",
+            id="sidebar"),
+            Div(
+                *[lockerItem() for _ in range(5)],
+            id="main-dashboard"),
             
-            id="main-dashboard",
-            style="background-color: #dcedf5; flex-grow: 5; padding: 5rem"),
-        style="display:flex; flex-direction:row; align-content: stretch; height: 100vh"),
+        id="dashboard-container"),
     style="padding:0")
 
 @rt("/maintenance")

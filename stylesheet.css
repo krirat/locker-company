@@ -1,0 +1,29 @@
+nav {
+    color:white; 
+    background-color:#2991c2; 
+    padding: 2rem;
+}
+
+#sidebar {
+    background-color:#0c364a; 
+    flex-grow: 1; 
+    display:flex; 
+    flex-direction:column; 
+    padding: 1rem;
+}
+
+#main-dashboard {
+    background-color: #dcedf5; 
+    flex-grow: 5; 
+    padding: 5rem; 
+    display:flex; 
+    flex-wrap: wrap; 
+    justify-content: space-between;
+}
+
+#dashboard-container {
+    display:flex; 
+    flex-direction:row; 
+    align-content: stretch; 
+    height: 100vh;
+}
