@@ -20,7 +20,11 @@ class User :
 
     @property
     def name(self):
-        return self.__name   
+        return self.__name  
+     
+    @property
+    def phone(self):
+        return self.__phone   
 
     def login(self, id, password):
         print(f"{self.name} logged in.")

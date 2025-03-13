@@ -12,7 +12,6 @@ jd = Guest("John Doe", "johndoe01@gmail.com", "012345678", "1234")
 admin = Admin("admin", "admin", "", "admin")
 mt = Maintenance("maintenance", "maintenance", "", "1234")
 
-idCounter = 3
 
 authService = AuthService()
 authService.registerUser(jd)
@@ -58,6 +57,15 @@ def post(name:str, email:str, phone:str, password:str):
     return dashboard(newUser)
 
 
+@rt("/userinfo")
+def post(name:str, email:str, phone:str):
+    return Div(
+         P(name),
+         P(email),
+         P(phone),
+         
+    )
+     
 
 def loginPage():
     return Titled("The Locker Company", 
@@ -93,27 +101,34 @@ def lockerItem(id,status):
          cls="locker"
     )
 
-def sidebarButtons(role):
-    match role:
-        case "Guest":
-            return [
-                Div("Lockers",cls="sidebar-button"),
-                Div("Payment",cls="sidebar-button"),
-                Div("User Info", cls="sidebar-button")
-            ]
-        case "Maintenance":
-            return [
-                Div("User Info", cls="sidebar-button")
-            ]
-        case "Admin":
-            return [
-                Div("Lockers",cls="sidebar-button"),
-                Div("Payment",cls="sidebar-button"),
-                Div("User Info", cls="sidebar-button",),
-                Div("Add Locker",cls='sidebar-button'),
-                Div("Remove Locker",cls='sidebar-button'),
-                Div("Edit Locker",cls='sidebar-button'),
-            ]
+
+def getLockerList():
+     return H1("asfasdfas")
+
+
+def sidebarButtons(user):
+    if type(user) == Admin:
+        return [
+            Div("Lockers",cls="sidebar-button",hx_post="/lockers", hx_target=".modal"),
+            Div("Payment",cls="sidebar-button"),
+            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal"),
+            Div("Add Locker",cls='sidebar-button'),
+            Div("Remove Locker",cls='sidebar-button'),
+            Div("Edit Locker",cls='sidebar-button'),
+        ]
+    if type(user) == Maintenance:
+        return [
+            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal"),
+        ]
+    if type(user) == Guest:
+        return [
+            Div("Lockers",cls="sidebar-button",hx_post="/lockers", hx_vals="user:user"),
+            Div("Payment",cls="sidebar-button"),
+            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal"),
+            
+        ]
+        
+
 
 
 def dashboard(user):
@@ -129,13 +144,14 @@ def dashboard(user):
         Nav(H1(f"Hello, {user.name}"), A("Log Out", href="/")),
         Div(
             Div(
-                *sidebarButtons(userType),
+                *sidebarButtons(user),
             id="sidebar"),
             Div(
                 *[lockerItem(locker.number, locker.status) for locker in lockerManager.lockers],
             id="main-dashboard"),
             
         id="dashboard-container"),
+        Div(cls="modal"),
     style="padding:0")
 
 
