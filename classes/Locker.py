@@ -1,5 +1,4 @@
 from classes.User import User
-#from classes.Reservation import Reservation
 
 class Locker :
     def __init__(self, lockerNumber : int, status : str, assignedUser : User, pin : int) :
@@ -34,6 +33,6 @@ class Locker :
         self.__status = "Available"
         print(f"Locker {self.__lockerNumber} is now free.")
 
-    def is_available(self):
+    def isAvailable(self):
         return self.__status == "Available"
         

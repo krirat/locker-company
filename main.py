@@ -25,7 +25,10 @@ lockerManager.lockers.append(Locker(4,"Available",None,""))
 lockerManager.lockers.append(Locker(5,"Available",None,""))
 
 
-app, rt = fast_app(live=True, hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
+app, rt = fast_app(hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
+
+currentUser = None
+
 
 
 @rt("/")
@@ -37,6 +40,8 @@ def post(email:str, password:str):
     user = authService.loginUser(email,password)
 
     if user:
+        global currentUser
+        currentUser = user
         return dashboard(user)
     else:
         return loginPage()
@@ -50,6 +55,8 @@ def get():
 def post(name:str, email:str, phone:str, password:str):
     newUser = Guest(name, email, phone, password)
     authService.registerUser(newUser)
+    global currentUser
+    currentUser = newUser
     return dashboard(newUser)
 
 
@@ -58,8 +65,30 @@ def post(name:str, email:str, phone:str):
     return Div(
                 P(name),
                 P(email),
-                P(phone),    
+                P(phone), 
             )
+
+@rt("/reservelocker/{id}")
+def get(id:int):
+    locker = lockerManager.get_locker_by_number(id)
+    lockerManager.assign_locker_to_user(locker, currentUser)
+    locker.set_pin("1234")
+    return Div(
+        H1("Reservation Successful"),
+        P(f"Your PIN is: {locker.get_pin()}"),
+        P("Have a good day!"),
+    )
+
+@rt("/lockers")
+def get():
+    return Div(
+
+    )
+
+@rt("/refresh")
+def get():
+    return [lockerItem(number, locker.status) if locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)]
+    
      
 # ------ Components -----------------------
 
@@ -93,13 +122,6 @@ def registerPage():
         
 def dashboard(user):
 
-    if type(user) == Admin:
-            userType = "Admin"
-    if type(user) == Maintenance:
-            userType = "Maintenance"
-    if type(user) == Guest:
-            userType = "Guest"
-
     return Main(
                 Nav(
                      H1(f"Hello, {user.name}"), 
@@ -111,12 +133,15 @@ def dashboard(user):
                         id="sidebar"
                     ),
                     Div(
-                        *[lockerItem(locker.number, locker.status) for locker in lockerManager.lockers],
-                        id="main-dashboard"
+                        *[lockerItem(number, locker.status) if locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)],
+                        id="main-dashboard",hx_get="/refresh"
                     ),
                     id="dashboard-container"
                 ),
-                Div(cls="modal"),
+                Div(
+                    Div(cls="modal-content"),
+                    id="modal"
+                ),
             style="padding:0"
             )
 
@@ -124,9 +149,27 @@ def sidebarButtons(user):
 
     if type(user) == Admin:
         return [
+
+            Script('''
+        
+        function closeModal(){
+                let modal = document.getElementById("modal")
+                modal.removeAttribute("class")
+        }
+        function openModal(){
+                let modal = document.getElementById("modal")
+                modal.setAttribute("class","active")
+                modal.addEventListener("click",closeModal)
+        }
+        var buttons = document.getElementsByClassName("sidebar-button")
+        for (var button of buttons) {
+                 button.addEventListener("click", openModal)
+        }
+    '''),
+
             Div("Lockers",cls="sidebar-button",hx_post="/lockers", hx_target=".modal"),
             Div("Payment",cls="sidebar-button"),
-            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal"),
+            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal-content"),
             Div("Add Locker",cls='sidebar-button'),
             Div("Remove Locker",cls='sidebar-button'),
             Div("Edit Locker",cls='sidebar-button'),
@@ -134,14 +177,48 @@ def sidebarButtons(user):
     
     if type(user) == Maintenance:
         return [
-            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal"),
+
+            Script('''
+        
+        function closeModal(){
+                let modal = document.getElementById("modal")
+                modal.removeAttribute("class")
+        }
+        function openModal(){
+                let modal = document.getElementById("modal")
+                modal.setAttribute("class","active")
+                modal.addEventListener("click",closeModal)
+        }
+        var buttons = document.getElementsByClassName("sidebar-button")
+        for (var button of buttons) {
+                 button.addEventListener("click", openModal)
+        }
+    '''),
+            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal-content"),
         ]
     
     if type(user) == Guest:
         return [
+
+            Script('''
+        
+        function closeModal(){
+                let modal = document.getElementById("modal")
+                modal.removeAttribute("class")
+        }
+        function openModal(){
+                let modal = document.getElementById("modal")
+                modal.setAttribute("class","active")
+                modal.addEventListener("click",closeModal)
+        }
+        var buttons = document.getElementsByClassName("sidebar-button")
+        for (var button of buttons) {
+                 button.addEventListener("click", openModal)
+        }
+    '''),
             Div("Lockers",cls="sidebar-button",hx_post="/lockers", hx_vals="user:user"),
             Div("Payment",cls="sidebar-button"),
-            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal"),
+            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal-content"),
             
         ]
     
@@ -151,7 +228,26 @@ def lockerItem(id,status):
          H2("Locker"),
          H3(id), 
          P(status), 
-         cls="locker"
+         Script('''
+        
+        function closeModal(){
+                let modal = document.getElementById("modal")
+                modal.removeAttribute("class")
+        }
+        function openModal(){
+                let modal = document.getElementById("modal")
+                modal.setAttribute("class","active")
+                modal.addEventListener("click",closeModal)
+        }
+        var buttons = document.getElementsByClassName("locker")
+        for (var button of buttons) {
+                 button.addEventListener("click", openModal)
+        }
+    '''),
+         cls=f"locker {id}",
+         hx_get=f"/reservelocker/{id}",
+         hx_target=".modal-content"
+
     )
 
 
