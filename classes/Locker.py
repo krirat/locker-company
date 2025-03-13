@@ -21,6 +21,9 @@ class Locker :
     def get_pin(self):
         return self.__pin
     
+    def set_pin(self, pin):
+        self.__pin = pin
+    
     def assignUser(self, user: User):
         self.__assignedUser = user
         self.__status = "Occupied"

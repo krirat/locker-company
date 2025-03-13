@@ -10,9 +10,9 @@ class AuthService:
     def loginUser(self, email, password):
         for user in self.__users:
             if user.email == email and user.password == password:
-                return "Access granted"
+                return user
 
-        return "Access Denied"
+        return False
 
     def validatePin(locker: Locker, pin) -> bool:
         pass

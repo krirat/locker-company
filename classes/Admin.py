@@ -12,5 +12,5 @@ class Admin(User):
         locker.free()
     
     def change_locker_pin(self, pin, locker):
-        locker.get_pin() = pin
+        locker.set_pin(pin)
         print(f"Locker {locker.lockerNumber} pin changed.")
