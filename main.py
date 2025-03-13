@@ -1,15 +1,16 @@
 from fasthtml.common import *
 import datetime
 from classes.AuthService import AuthService
+from classes.ActivityLog import ActivityLog
 from classes.Guest import Guest
 from classes.Locker import Locker
 from classes.LockerManager import LockerManager
 from classes.Admin import Admin
 from classes.Maintenance import Maintenance
-#from classes.Reservation import Reservation
 
 authService = AuthService()
 lockerManager = LockerManager("lockers")
+activityLog = ActivityLog()
 
 jd = Guest("John Doe", "johndoe01@gmail.com", "012345678", "1234")
 admin = Admin("admin", "admin", "", "admin")
@@ -42,10 +43,10 @@ def post(email:str, password:str):
     if user:
         global currentUser
         currentUser = user
+        activityLog.log_event(user,None,"Login",datetime.datetime.now())
         return dashboard(user)
     else:
         return loginPage()
-
 
 @rt("/register")
 def get():
@@ -57,40 +58,60 @@ def post(name:str, email:str, phone:str, password:str):
     authService.registerUser(newUser)
     global currentUser
     currentUser = newUser
+    activityLog.log_event(newUser,None,"Login",datetime.datetime.now())
     return dashboard(newUser)
 
 
-@rt("/userinfo")
-def post(name:str, email:str, phone:str):
-    return Div(
-                P(name),
-                P(email),
-                P(phone), 
-            )
 
-@rt("/reservelocker/{id}")
+@rt("/reserve/{id}")
 def get(id:int):
     locker = lockerManager.get_locker_by_number(id)
     lockerManager.assign_locker_to_user(locker, currentUser)
     locker.set_pin("1234")
+    activityLog.log_event(currentUser,locker,"Reserve",datetime.datetime.now())
+
     return Div(
-        H1("Reservation Successful"),
-        P(f"Your PIN is: {locker.get_pin()}"),
-        P("Have a good day!"),
-    )
+                H1("Reservation Successful"),
+                P(f"Your PIN is: {locker.get_pin()}"),
+                P("Have a good day!"),
+            )
 
 @rt("/lockers")
 def get():
-    return Div(
+    return lockerList()
 
+@rt("/payment")
+def get():
+    return Div(
+        P("moneyyy")
     )
 
-@rt("/refresh")
+@rt("/userinfo")
 def get():
-    return [lockerItem(number, locker.status) if locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)]
+    return Div(
+                P(currentUser.name),
+                P(currentUser.email),
+                P(currentUser.phone), 
+            )
+
+@rt("/addlocker")
+def get():
+    lockerManager.add_locker()
+    activityLog.log_event(currentUser,None,"Add Locker",datetime.datetime.now())
+    return lockerList()
+
+@rt("/removelocker")
+def get():
+    lockerManager.remove_locker()
+    activityLog.log_event(currentUser,None,"Remove Locker",datetime.datetime.now())
+    return lockerList()
+
     
      
 # ------ Components -----------------------
+
+def lockerList():
+    return [lockerItem(number, locker.status) if locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)]
 
 def loginPage():
 
@@ -134,7 +155,7 @@ def dashboard(user):
                     ),
                     Div(
                         *[lockerItem(number, locker.status) if locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)],
-                        id="main-dashboard",hx_get="/refresh"
+                        id="main-dashboard",hx_get="/lockers"
                     ),
                     id="dashboard-container"
                 ),
@@ -142,84 +163,31 @@ def dashboard(user):
                     Div(cls="modal-content"),
                     id="modal"
                 ),
-            style="padding:0"
+                style="padding:0"
             )
 
 def sidebarButtons(user):
 
     if type(user) == Admin:
         return [
-
-            Script('''
-        
-        function closeModal(){
-                let modal = document.getElementById("modal")
-                modal.removeAttribute("class")
-        }
-        function openModal(){
-                let modal = document.getElementById("modal")
-                modal.setAttribute("class","active")
-                modal.addEventListener("click",closeModal)
-        }
-        var buttons = document.getElementsByClassName("sidebar-button")
-        for (var button of buttons) {
-                 button.addEventListener("click", openModal)
-        }
-    '''),
-
-            Div("Lockers",cls="sidebar-button",hx_post="/lockers", hx_target=".modal"),
-            Div("Payment",cls="sidebar-button"),
-            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal-content"),
-            Div("Add Locker",cls='sidebar-button'),
-            Div("Remove Locker",cls='sidebar-button'),
-            Div("Edit Locker",cls='sidebar-button'),
-        ]
+            Div("Lockers", cls="sidebar-button", hx_get="/lockers", hx_target="#main-dashboard"),
+            Div("Payment", cls="sidebar-button", hx_get="/payment", hx_target="#main-dashboard"),
+            Div("User Info", cls="sidebar-button", hx_get="/userinfo", hx_target="#main-dashboard"),
+            Div("Add Locker", cls='sidebar-button', hx_get="/addlocker", hx_target="#main-dashboard"),
+            Div("Remove Locker", cls='sidebar-button', hx_get="/removelocker", hx_target="#main-dashboard"),
+            Div("Edit Locker", cls='sidebar-button', hx_get="/editlocker", hx_target="#main-dashboard"),
+        ] 
     
     if type(user) == Maintenance:
         return [
-
-            Script('''
-        
-        function closeModal(){
-                let modal = document.getElementById("modal")
-                modal.removeAttribute("class")
-        }
-        function openModal(){
-                let modal = document.getElementById("modal")
-                modal.setAttribute("class","active")
-                modal.addEventListener("click",closeModal)
-        }
-        var buttons = document.getElementsByClassName("sidebar-button")
-        for (var button of buttons) {
-                 button.addEventListener("click", openModal)
-        }
-    '''),
-            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal-content"),
+            Div("User Info", cls="sidebar-button",hx_get="/userinfo", hx_target="#main-dashboard"),
         ]
     
     if type(user) == Guest:
         return [
-
-            Script('''
-        
-        function closeModal(){
-                let modal = document.getElementById("modal")
-                modal.removeAttribute("class")
-        }
-        function openModal(){
-                let modal = document.getElementById("modal")
-                modal.setAttribute("class","active")
-                modal.addEventListener("click",closeModal)
-        }
-        var buttons = document.getElementsByClassName("sidebar-button")
-        for (var button of buttons) {
-                 button.addEventListener("click", openModal)
-        }
-    '''),
-            Div("Lockers",cls="sidebar-button",hx_post="/lockers", hx_vals="user:user"),
-            Div("Payment",cls="sidebar-button"),
-            Div("User Info", cls="sidebar-button",hx_post="/userinfo", hx_vals=f'{{"name": "{user.name}", "email": "{user.email}", "phone": "{user.phone}"}}',hx_target=".modal-content"),
-            
+            Div("Lockers", cls="sidebar-button", hx_get="/lockers", hx_target="#main-dashboard"),
+            Div("Payment", cls="sidebar-button", hx_get="/payment", hx_target="#main-dashboard"),
+            Div("User Info", cls="sidebar-button", hx_get="/userinfo", hx_target="#main-dashboard"),     
         ]
     
 def lockerItem(id,status):
@@ -228,24 +196,27 @@ def lockerItem(id,status):
          H2("Locker"),
          H3(id), 
          P(status), 
+
          Script('''
         
-        function closeModal(){
-                let modal = document.getElementById("modal")
-                modal.removeAttribute("class")
-        }
-        function openModal(){
-                let modal = document.getElementById("modal")
-                modal.setAttribute("class","active")
-                modal.addEventListener("click",closeModal)
-        }
-        var buttons = document.getElementsByClassName("locker")
-        for (var button of buttons) {
-                 button.addEventListener("click", openModal)
-        }
-    '''),
+            function closeModal(){
+                    let modal = document.getElementById("modal")
+                    modal.removeAttribute("class")
+            }
+            function openModal(){
+                    let modal = document.getElementById("modal")
+                    modal.setAttribute("class","active")
+                    modal.addEventListener("click",closeModal)
+            }
+            var buttons = document.getElementsByClassName("locker")
+            for (var button of buttons) {
+                    button.addEventListener("click", openModal)
+            }
+                
+        '''),
+
          cls=f"locker {id}",
-         hx_get=f"/reservelocker/{id}",
+         hx_get=f"/reserve/{id}",
          hx_target=".modal-content"
 
     )

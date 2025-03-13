@@ -7,3 +7,11 @@ class LogEvent:
         self.locker = locker
         self.action = action
         self.timestamp = timestamp
+
+    # @property
+    # def user(self):
+    #     return self.user
+    
+    # @user.setter
+    # def user(self, newUser):
+    #     self.user = newUser

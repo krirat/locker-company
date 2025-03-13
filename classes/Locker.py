@@ -1,7 +1,7 @@
 from classes.User import User
 
 class Locker :
-    def __init__(self, lockerNumber : int, status : str, assignedUser : User, pin : int) :
+    def __init__(self, lockerNumber : int, status : str, assignedUser : User, pin : str) :
         self.__lockerNumber = lockerNumber
         self.__status = status
         self.__assignedUser = assignedUser
@@ -15,6 +15,10 @@ class Locker :
     @property
     def status(self):
         return self.__status
+    
+    @property
+    def assignedUser(self) -> User:
+        return self.__assignedUser
 
 
     def get_pin(self):
