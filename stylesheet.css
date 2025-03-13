@@ -27,6 +27,7 @@ a {
 }
 
 #main-dashboard {
+    color: #0a2d3d;
     background-color: #dcedf5; 
     flex-grow: 5; 
     padding: 5rem; 
@@ -49,6 +50,20 @@ a {
 }
 
 .locker:hover{
+    background-color: #2583af;
+}
+
+.locker-closed {
+    background-color: #2991c2;
+    width: 10vw;
+    height: 10vw;
+    margin-right: 2rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.locker-closed:hover{
     background-color: #2583af;
 }
 
