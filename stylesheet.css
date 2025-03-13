@@ -14,6 +14,7 @@ nav {
 
 .sidebar-button {
     margin-bottom: 0.5rem;
+    padding: 0.5rem;
 }
 
 .sidebar-button:hover {
@@ -29,6 +30,7 @@ nav {
     justify-content: flex-start;
     align-content: flex-start;
     max-width: 85vw;
+    overflow-y: scroll;
 }
 
 .locker {
@@ -37,6 +39,12 @@ nav {
     height: 10vw;
     margin-right: 2rem;
     margin-bottom: 2rem;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.locker:hover{
+    background-color: #2583af;
 }
 
 #dashboard-container {

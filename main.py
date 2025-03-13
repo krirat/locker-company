@@ -12,12 +12,12 @@ authService = AuthService()
 authService.registerUser(jd)
 
 lockerManager = LockerManager("lockers")
-lockerManager.lockers.append(Locker(0,"Available",None,"",None,None))
-lockerManager.lockers.append(Locker(1,"Available",None,"",None,None))
-lockerManager.lockers.append(Locker(2,"Occupied", jd, "", datetime.datetime.now(),None))
-lockerManager.lockers.append(Locker(3,"Available",None,"",None,None))
-lockerManager.lockers.append(Locker(4,"Available",None,"",None,None))
-lockerManager.lockers.append(Locker(5,"Available",None,"",None,None))
+lockerManager.lockers.append(Locker(0,"Available",None,""))
+lockerManager.lockers.append(Locker(1,"Available",None,""))
+lockerManager.lockers.append(Locker(2,"Occupied", jd, ""))
+lockerManager.lockers.append(Locker(3,"Under maintenance",None,""))
+lockerManager.lockers.append(Locker(4,"Available",None,""))
+lockerManager.lockers.append(Locker(5,"Available",None,""))
 
 
 app, rt = fast_app(live=True, pico=True, hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
@@ -43,8 +43,29 @@ def post(email:str, password:str):
 
 
 def lockerItem(id,status):
-    return Div(H2("Locker"),P(id),P(status),cls="locker")
+    return Div(H2("Locker"),H3(id), P(status), cls="locker")
 
+def sidebar_buttons(role):
+    match role:
+        case "Guest":
+            return [
+                Div("Lockers",cls="sidebar-button"),
+                Div("Payment",cls="sidebar-button"),
+                Div("User Info", cls="sidebar-button")
+            ]
+        case "Maintenance":
+            return [
+                Div("User Info", cls="sidebar-button")
+            ]
+        case "Admin":
+            return [
+                Div("Lockers",cls="sidebar-button"),
+                Div("Payment",cls="sidebar-button"),
+                Div("User Info", cls="sidebar-button"),
+                Div("Add Locker",cls='sidebar-button'),
+                Div("Remove Locker",cls='sidebar-button'),
+                Div("Edit Locker",cls='sidebar-button'),
+            ]
 
 @rt("/dashboard")
 def get():
@@ -52,10 +73,10 @@ def get():
         Nav(H1("Hello")),
         Div(
             Div(
-                *[Div("button", style="padding: 0.5rem", cls="sidebar-button") for _ in range(5)],
+                *sidebar_buttons("Admin"),
             id="sidebar"),
             Div(
-                *[lockerItem(locker.number, "Available" if locker.is_available() else "Occupied") for locker in lockerManager.lockers],
+                *[lockerItem(locker.number, locker.status) for locker in lockerManager.lockers],
             id="main-dashboard"),
             
         id="dashboard-container"),
