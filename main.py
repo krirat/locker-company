@@ -8,9 +8,11 @@ from classes.Admin import Admin
 from classes.Maintenance import Maintenance
 #from classes.Reservation import Reservation
 
-jd = Guest(0, "John Doe", "johndoe01@gmail.com", "012345678", "1234")
-admin = Admin(1, "admin", "admin", "", "admin")
-mt = Maintenance(2, "maintenance", "maintenance", "", "1234")
+jd = Guest("John Doe", "johndoe01@gmail.com", "012345678", "1234")
+admin = Admin("admin", "admin", "", "admin")
+mt = Maintenance("maintenance", "maintenance", "", "1234")
+
+idCounter = 3
 
 authService = AuthService()
 authService.registerUser(jd)
@@ -29,37 +31,69 @@ lockerManager.lockers.append(Locker(5,"Available",None,""))
 app, rt = fast_app(live=True, pico=True, hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
 
 
-def login_page():
+
+@rt("/")
+def get():
+    return loginPage()
+
+@rt("/")
+def post(email:str, password:str):
+    user = authService.loginUser(email,password)
+
+    if user:
+        return dashboard(user)
+    else:
+        return loginPage()
+
+
+
+@rt("/register")
+def get():
+    return registerPage()
+
+@rt("/register")
+def post(name:str, email:str, phone:str, password:str):
+    newUser = Guest(name, email, phone, password)
+    authService.registerUser(newUser)
+    return dashboard(newUser)
+
+
+
+def loginPage():
     return Titled("The Locker Company", 
             P("Welcome!"),   
             Form(
                 Input(type="text", name="email"),
                 Input(type="password", name="password"),
-                Button("Login"),
-                action="/", method="post"
+                Button("Login", id="login"),
+                hx_post="/", hx_target="body", id="login-form"
             ),
-            
+            P("Register", id="register", hx_get="/register", hx_target="body"),
         )
 
-@rt("/")
-def get():
-    return login_page()
-
-
-@rt("/")
-def post(email:str, password:str):
-    result = authService.loginUser(email,password)
-
-    if result:
-        return dashboard(result)
-    else:
-        return login_page()
-
+def registerPage():
+    return Titled("The Locker Company", 
+            P("Welcome!"),   
+            Form(
+                Input(type="text", name="name"),
+                Input(type="email", name="email"),
+                Input(type="text", name="phone"),
+                Input(type="text", name="password"),
+                Button("Register", id="register"),
+                hx_post="/register", hx_target="body", id="register-form"
+            ),
+            P("login", id="login", hx_get="/", hx_target="body"),
+        )
 
 def lockerItem(id,status):
-    return Div(H2("Locker"),H3(id), P(status), cls="locker")
+    return Div(
+         H2("Locker"),
+         H3(id), 
+         P(status), 
+         cls="locker"
+    )
 
-def sidebar_buttons(role):
+def sidebarButtons(role):
     match role:
         case "Guest":
             return [
@@ -75,7 +109,7 @@ def sidebar_buttons(role):
             return [
                 Div("Lockers",cls="sidebar-button"),
                 Div("Payment",cls="sidebar-button"),
-                Div("User Info", cls="sidebar-button"),
+                Div("User Info", cls="sidebar-button",),
                 Div("Add Locker",cls='sidebar-button'),
                 Div("Remove Locker",cls='sidebar-button'),
                 Div("Edit Locker",cls='sidebar-button'),
@@ -85,17 +119,17 @@ def sidebar_buttons(role):
 def dashboard(user):
 
     if type(user) == Admin:
-            user_type = "Admin"
+            userType = "Admin"
     if type(user) == Maintenance:
-            user_type = "Maintenance"
+            userType = "Maintenance"
     if type(user) == Guest:
-            user_type = "Guest"
+            userType = "Guest"
 
     return Main(
-        Nav(H1("Hello"), A("Log Out", href="/")),
+        Nav(H1(f"Hello, {user.name}"), A("Log Out", href="/")),
         Div(
             Div(
-                *sidebar_buttons(user_type),
+                *sidebarButtons(userType),
             id="sidebar"),
             Div(
                 *[lockerItem(locker.number, locker.status) for locker in lockerManager.lockers],
