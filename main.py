@@ -20,8 +20,8 @@ authService.registerUser(admin)
 authService.registerUser(mt)
 lockerManager.lockers.append(Locker(0,"Available",None,""))
 lockerManager.lockers.append(Locker(1,"Available",None,""))
-lockerManager.lockers.append(Locker(2,"Occupied", jd, ""))
-lockerManager.lockers.append(Locker(3,"Under maintenance",None,""))
+lockerManager.lockers.append(Locker(2,"Available", None, ""))
+lockerManager.lockers.append(Locker(3,"Available",None,""))
 lockerManager.lockers.append(Locker(4,"Available",None,""))
 lockerManager.lockers.append(Locker(5,"Available",None,""))
 
@@ -140,7 +140,7 @@ def lockerList():
     return [lockerItem(number, locker.status) if locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)]
 
 def myLockerList():
-    return [closedLockerItem(number, locker.status) if not locker.isAvailable() else None for number, locker in enumerate(lockerManager.lockers)]
+    return [closedLockerItem(number, locker.status) if not locker.isAvailable() and locker.assignedUser == currentUser else None for number, locker in enumerate(lockerManager.lockers)]
 
 def loginPage():
 
@@ -206,7 +206,6 @@ def sidebarButtons(user):
             Div("Payment", cls="sidebar-button", hx_get="/payment", hx_target="#main-dashboard"),
             Div("Add Locker", cls='sidebar-button', hx_get="/addlocker", hx_target="#main-dashboard"),
             Div("Remove Locker", cls='sidebar-button', hx_get="/removelocker", hx_target="#main-dashboard"),
-            Div("Edit Locker", cls='sidebar-button', hx_get="/editlocker", hx_target="#main-dashboard"),
         ] 
     
     if type(user) == Maintenance:
