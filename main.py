@@ -25,7 +25,7 @@ lockerManager.lockers.append(Locker(4,"Available",None,""))
 lockerManager.lockers.append(Locker(5,"Available",None,""))
 
 
-app, rt = fast_app(live=True, pico=True, hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
+app, rt = fast_app(live=True, hdrs=(Link(rel='stylesheet', href='stylesheet.css', type='text/css'),None)) #added ,None to make a tuple
 
 
 @rt("/")
@@ -56,11 +56,10 @@ def post(name:str, email:str, phone:str, password:str):
 @rt("/userinfo")
 def post(name:str, email:str, phone:str):
     return Div(
-         P(name),
-         P(email),
-         P(phone),
-         
-    )
+                P(name),
+                P(email),
+                P(phone),    
+            )
      
 # ------ Components -----------------------
 
