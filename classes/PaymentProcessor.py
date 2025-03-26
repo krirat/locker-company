@@ -10,4 +10,5 @@ class PaymentProcessor:
             print(f"Payment of {amount} processed. New balance: {user.balance}")
         else:
             print(f"Insufficient balance to process payment of {amount}.")
+        return user.balance
         

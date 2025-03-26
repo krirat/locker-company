@@ -38,14 +38,14 @@ def get():
     return loginPage()
 
 @rt("/")
-def post(session, email:str, password:str):
+def post(email:str, password:str):
     user = authService.loginUser(email,password)
     
     if user:
-        session['user'] = user
         global currentUser
         currentUser = user
         activityLog.log_event(user,None,"Login",datetime.datetime.now())
+        return dashboard(user)
     else:
         return loginPage()
 
@@ -165,8 +165,8 @@ def post(amount : float):
 
 @rt("/payment/process")
 def post(amount : float):
-    PaymentProcessor.process_payment(currentUser, amount)
-    if currentUser.balance >= amount:
+    newBalance = PaymentProcessor.process_payment(currentUser, amount)
+    if newBalance >= amount:
         return Div(
             P(f"Payment of {amount} processed. New balance: {currentUser.balance}")
         )
