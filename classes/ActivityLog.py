@@ -8,6 +8,8 @@ class ActivityLog :
         log_entry = LogEvent(user, locker, action, timestamp)
         self.logs.append(log_entry)
         
+    def get_logs(self):
+        return self.logs
 
     def get_logs_for_user(self, user):
         return [log for log in self.logs if log.user == user]

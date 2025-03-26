@@ -39,6 +39,10 @@ a {
     overflow-y: scroll;
 }
 
+#main-dashboard p,li {
+    color: #0a2d3d;
+}
+
 .locker {
     background-color: #2991c2;
     width: 10vw;
@@ -47,6 +51,9 @@ a {
     margin-bottom: 2rem;
     padding: 0.5rem;
     text-align: center;
+}
+.locker p {
+    color: #e0e3e7
 }
 
 .locker:hover{
@@ -63,6 +70,9 @@ a {
     text-align: center;
 }
 
+.locker-closed p {
+    color: #e0e3e7
+}
 .locker-closed:hover{
     background-color: #2583af;
 }
@@ -93,9 +103,11 @@ a {
   
   /* Modal Content/Box */
   .modal-content {
-    background-color: #fefefe;
+    background-color: rgb(19, 22.5, 30.5);
     margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
     border: 1px solid #888;
     border-radius: 20px;
-    width: 80%; /* Could be more or less, depending on screen size */
+    width: clamp(30%, 50%, 50%); /* Could be more or less, depending on screen size */
+    max-height: 50%;
+    padding: 1rem;
   }
